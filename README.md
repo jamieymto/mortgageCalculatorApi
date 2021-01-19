@@ -1,5 +1,4 @@
-# mortgateCalculator
-Mortgage Calculate API
+# Mortgate Calculator API
 
 ## Pre-requisites
 
@@ -9,10 +8,15 @@ Mortgage Calculate API
 
 ## Get Started
 
-* 
+* To run locally
+
+`npm install`
+`npm run start`
 
 ## Testing
 
-* 
+`npm run test:unit`
+
+`npm run test:integration`
 
 
