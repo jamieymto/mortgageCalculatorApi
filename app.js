@@ -3,7 +3,7 @@ import express from 'express';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 
-const HOSTNAME = '127.0.0.1';
+const HOSTNAME = '0.0.0.0';
 const PORT = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
