@@ -11,7 +11,7 @@
 * To run locally
 
 `npm install`
-`npm run start`
+`npm run local`
 
 ## Testing
 
