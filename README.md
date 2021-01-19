@@ -23,6 +23,18 @@
 
 `heroku open`
 
+* cURL a POST request to test
+
+`curl --location --request POST 'https://sheltered-escarpment-94741.herokuapp.com/v1/calculator' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "propertyPrice": 800000,
+    "downPaymentPercent": 10,
+    "interestRatePercent": 2.94,
+    "amortizationPeriod": 15,
+    "paymentSchedule": "MTHLY"
+}'`
+
 ## Testing
 
 `npm run test:unit`
