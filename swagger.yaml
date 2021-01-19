@@ -1,0 +1,61 @@
+openapi: 3.0.0
+info:
+  title: Mortgage Calculator
+  description: API documentation for Mortgage Calculator
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+    description: local environment
+  - url: https://sheltered-escarpment-94741.herokuapp.com
+    description: production environment
+paths:
+  /v1/calculator:
+    post:
+      summary: Calculate a mortgage payment per payment schedule.
+      description: Mortgage Calculator calculates mortgage payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MortgagePaymentConstraints'
+      responses:
+        '200':
+          description: A JSON object containing mortgage payment per schedule
+          content:
+            application/json:
+              schema: 
+                type: object
+                items:
+                    $ref: '#/components/schemas/MortgagePaymentPerSchedule'
+components:
+  schemas:
+    MortgagePaymentConstraints:
+      properties:
+        propertyPrice:
+          type: number
+          description: The price of the home
+        downPayment:
+          type: number
+          description: The amount you pay up front to obtain a mortgage
+        interestRate:
+          type: number
+          description: The annual interest rate
+        amortizationPeriod:
+          type: number
+          description: The length of time to pay off mortgage
+        paymentSchedule:
+          type: string
+          enum: [BIWKLY, ACC_BIWKLY, MTHLY]
+          description: >
+              Mortgage Payment Schedule:
+                
+                * `BIWKLY` - Biweekly payments, total 26 payments per year
+                * `ACC_BIWKLY` - Accelerated Biweekly payments.  total 26 payments per year, each payment is half of monthly payment
+                * `MTHLY` - Monthly payments - total 12 payments per year
+    MortgagePaymentPerSchedule:
+      properties:
+        paymentPerSchedule:
+          type: number
+          description: The amount to pay for the chosen payment schedule
+      

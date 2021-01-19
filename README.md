@@ -35,6 +35,17 @@
     "paymentSchedule": "MTHLY"
 }'`
 
+
+## Documentation
+
+* Run cmd
+
+`npm run local`
+
+* Navigate to route in browser
+
+`http://localhost:3001/api-docs/`
+
 ## Testing
 
 `npm run test:unit`
