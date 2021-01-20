@@ -22,8 +22,8 @@ export const bc = () => {
                 upperBound: 3000000 // maximum residential mortgage
             }
         ],
-        interestRates: {
-            min: 0,
+        interestRate: {
+            min: 0.005,
             max: 0.05
         },
         amortizationPeriod: {

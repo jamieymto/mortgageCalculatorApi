@@ -22,8 +22,8 @@ const validateDownPayment = (downPayment, propertyPrice, province) => {
     if (provinceUpper === AlphaCode.BRITISH_COLUMBIA) {
         bc().downPayment.forEach(dp => {
             if (propertyPrice >= dp.lowerBound) {
-                remainingPropertyPrice = remainingPropertyPrice - dp.upperBound;
-                minimumDownPayment = minimumDownPayment + (propertyPrice * dp.min);
+                remainingPropertyPrice = remainingPropertyPrice < dp.upperBound ? 0 : remainingPropertyPrice - dp.upperBound;
+                minimumDownPayment = minimumDownPayment + (Math.min(propertyPrice, dp.upperBound) * dp.min);
             }
         })
     }
@@ -33,15 +33,20 @@ const validateDownPayment = (downPayment, propertyPrice, province) => {
     }
 }
 
-const validateInterestRate = (interestRate) => {
-
+const validateInterestRate = (interestRate, province) => {
+    let provinceUpper = province.toUpperCase();
+    if (provinceUpper === AlphaCode.BRITISH_COLUMBIA) {
+        if (interestRate < bc().interestRate.min || interestRate > bc().interestRate.max) {
+            throw new Error(`Invalid interest rate.  Valid interest rate is between ${bc().interestRate.min} and ${bc().interestRate.max}.`);
+        }
+    }
 }
 
 const validateAmortizationPeriod = (amortizationPeriod, province) => {
     let provinceUpper = province.toUpperCase();
     let isFiveYearIncrement = amortizationPeriod % 5 === 0;
-    if (!isFiveYearIncrement || provinceUpper === AlphaCode.BRITISH_COLUMBIA) {
-        if (amortizationPeriod < bc().amortizationPeriod.min || amortizationPeriod > bc().amortizationPeriod.max) {
+    if (provinceUpper === AlphaCode.BRITISH_COLUMBIA) {
+        if (!isFiveYearIncrement || amortizationPeriod < bc().amortizationPeriod.min || amortizationPeriod > bc().amortizationPeriod.max) {
             throw new Error('Invalid amortization period. Valid amortization periods are 5, 10, 15, 20, 25, and 30.');
         }
     }
@@ -89,10 +94,11 @@ export const getPaymentPerSchedule = ({ propertyPrice, downPayment, interestRate
     try {
         validatePropertyPrice(propertyPrice, province);
         validateDownPayment(downPayment, propertyPrice, province);
-        validateInterestRate(interestRate);
+        validateInterestRate(interestRate, province);
         validateAmortizationPeriod(amortizationPeriod, province);
         validatePaymentSchedule(paymentSchedule);
         validateProvince(province);
+        // TODO: throw array of error
     
         let paymentPerSchedule = calculate({ propertyPrice, downPayment, interestRate, amortizationPeriod, paymentSchedule });
         return paymentPerSchedule;
@@ -100,3 +106,5 @@ export const getPaymentPerSchedule = ({ propertyPrice, downPayment, interestRate
         throw err;
     }
 }
+
+export default { getPaymentPerSchedule };
