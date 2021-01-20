@@ -2,6 +2,9 @@ import { PaymentSchedule } from '../enums/mortgage.js';
 import { ValidAlphaCodes, AlphaCode } from '../enums/province.js';
 import { bc } from '../validation/mortgage.js';
 
+const NUM_BIWEEKLY_PAYMENTS = 26;
+const NUM_MONTHLY_PAYMENTS = 12;
+
 const validatePropertyPrice = (propertyPrice, province) => {
     let provinceUpper = province.toUpperCase();
     if (provinceUpper === AlphaCode.BRITISH_COLUMBIA) {
@@ -9,7 +12,6 @@ const validatePropertyPrice = (propertyPrice, province) => {
             throw new Error(`Invalid property price.  Valid mortgage principal is between ${bc().propertyPrice.min} and ${bc().propertyPrice.max}.`);
         }
     }
-
 }
 
 const validateDownPayment = (downPayment, propertyPrice, province) => {
@@ -27,7 +29,7 @@ const validateDownPayment = (downPayment, propertyPrice, province) => {
     }
 
     if (downPayment < minimumDownPayment) {
-        throw new Error('Down payment amount too low.  ');
+        throw new Error('Down payment amount too low.');
     }
 }
 
@@ -61,28 +63,40 @@ const validateProvince = (province) => {
     }
 }
 
-const calculate = ({ propertyPrice, downPayment, interestRate, amortizationPeriod, paymentSchedule, province }) => {
-    let numPaymentsPerYear = paymentSchedule.toUpperCase() === PaymentSchedule.BIWEEKLY ? 26 : 12;
+const getAcceleratedBiweeklyPayments = (paymentPerSchedule) => {
+    return paymentPerSchedule / 2;
+}
+
+const getCurrencyFloat = (num) => {
+    return Math.round(num * 100)/100;
+}
+
+const calculate = ({ propertyPrice, downPayment, interestRate, amortizationPeriod, paymentSchedule }) => {
+    let numPaymentsPerYear = paymentSchedule.toUpperCase() === PaymentSchedule.BIWEEKLY ? NUM_BIWEEKLY_PAYMENTS : NUM_MONTHLY_PAYMENTS;
     let principal = propertyPrice - downPayment;
     let interestRatePerSchedule = interestRate/numPaymentsPerYear;
     let totalNumPayment = amortizationPeriod * numPaymentsPerYear;
-
     let paymentPerSchedule = principal * ((interestRatePerSchedule * Math.pow(1 + interestRatePerSchedule, totalNumPayment) )/(Math.pow(1 + interestRatePerSchedule, totalNumPayment) - 1));
+
     if (paymentSchedule.toUpperCase() === PaymentSchedule.ACCELERATED_BIWEEKLY) {
-        paymentPerSchedule /= 2;
+        paymentPerSchedule = getAcceleratedBiweeklyPayments(paymentPerSchedule);
     }
-    let roundedInCurrency = parseFloat(paymentPerSchedule).toFixed(2);
+    let roundedInCurrency = getCurrencyFloat(paymentPerSchedule);
     return roundedInCurrency;
 }
 
 export const getPaymentPerSchedule = ({ propertyPrice, downPayment, interestRate, amortizationPeriod, paymentSchedule, province }) => {
-    validatePropertyPrice(propertyPrice, province);
-    validateDownPayment(downPayment, propertyPrice, province);
-    validateInterestRate(interestRate);
-    validateAmortizationPeriod(amortizationPeriod, province);
-    validatePaymentSchedule(paymentSchedule);
-    validateProvince(province);
-
-    let paymentPerSchedule = calculate({ propertyPrice, downPayment, interestRate, amortizationPeriod, paymentSchedule, province });
-    return paymentPerSchedule;
+    try {
+        validatePropertyPrice(propertyPrice, province);
+        validateDownPayment(downPayment, propertyPrice, province);
+        validateInterestRate(interestRate);
+        validateAmortizationPeriod(amortizationPeriod, province);
+        validatePaymentSchedule(paymentSchedule);
+        validateProvince(province);
+    
+        let paymentPerSchedule = calculate({ propertyPrice, downPayment, interestRate, amortizationPeriod, paymentSchedule });
+        return paymentPerSchedule;
+    } catch (err) {
+        throw err;
+    }
 }
