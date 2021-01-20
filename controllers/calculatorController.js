@@ -7,7 +7,7 @@ calculatorController.calculate = async (req, res, next) => {
         let paymentPerSchedule = getPaymentPerSchedule(req.body);
         return res.send({ paymentPerSchedule });
     } catch (err) {
-        return res.status(400).send({ error:err});
+        return res.status(400).send({ error: err});
     }
 }
 

@@ -53,6 +53,9 @@ components:
                 * `BIWKLY` - Biweekly payments, total 26 payments per year
                 * `ACC_BIWKLY` - Accelerated Biweekly payments.  total 26 payments per year, each payment is half of monthly payment
                 * `MTHLY` - Monthly payments - total 12 payments per year
+        province:
+          type: string
+          enum: [NL, PE, NS, NB, QC, ON, MB, SK, AB, BC, YT, NT, NU]
       example:
         propertyPrice: 1500000
         downPayment: 150000
